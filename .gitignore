@@ -1,0 +1,10 @@
+.DS_Store
+.env
+.env.*
+/build/
+/dist/
+*.test
+*.out
+*.log
+go.work
+go.work.sum
