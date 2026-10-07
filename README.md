@@ -1,12 +1,24 @@
 # go-zaim
 
-Zaim API向けのGo SDKです。OAuth 1.0aによる認証と、家計簿・ユーザー情報・マスターデータの操作を提供します。外部ライブラリへの依存はありません。
+Zaim API向けのGo SDKです。OAuth 1.0a認証と、家計簿・ユーザー情報・マスターデータの操作に対応しています。外部ライブラリへの依存はありません。
 
-Go 1.26.2以上が必要です。Goパッケージ名は`zaim`、モジュールパスは`github.com/yone-k/go-zaim`です。
+## 導入
+
+Go 1.26.2以上が必要です。現在、SDKは`feat/sdk-migration`ブランチにあり、リリースタグは未作成です。
+
+利用するGoプロジェクトで、SDK移植コミットを指定して取得してください。
+
+```bash
+go get github.com/yone-k/go-zaim@83d6c6393bd7
+```
+
+モジュールパスは`github.com/yone-k/go-zaim`、インポートしたパッケージの名前は`zaim`です。
 
 ## 使い方
 
 取得済みのOAuth認証情報を渡してクライアントを作成します。認証情報の保存や設定ファイルの読込みは、呼出し側で行ってください。
+
+次の例では、環境変数から認証情報を読み、ユーザー情報と家計簿のJSONを取得します。
 
 ```go
 package main
@@ -46,11 +58,19 @@ func main() {
 }
 ```
 
-`Request`はAPI応答を`json.RawMessage`で返します。小数金額や、SDKの型に含まれないフィールドを保持したい場合に使います。GET・POST・PUT・DELETEを受け付け、APIパスは`/v2/home/money`のような相対パスで指定します。
+## 型付きAPIと生JSONの使い分け
 
-型付きの取得・作成・更新APIも利用できます。型付きAPIの金額は`int`です。作成・更新・削除メソッドは`error`を返し、成功時の応答本文は返しません。応答本文が必要な場合は`Request`を使ってください。
+| 用途 | 使うAPI |
+|---|---|
+| Goの構造体で結果を扱う | `VerifyAuth`、`ListMoney`などの型付きAPI |
+| 小数金額や、SDKの型に含まれないフィールドを保持する | `Request` |
+| 作成・更新・削除後の応答本文を取得する | `Request` |
 
-## API
+型付きAPIの金額は`int`です。作成・更新・削除メソッドは`error`を返し、成功時の応答本文は返しません。
+
+`Request`はAPI応答を`json.RawMessage`で返します。GET・POST・PUT・DELETEを受け付け、APIパスは`/v2/home/money`のような相対パスで指定します。
+
+## API一覧
 
 | 対象 | 主なAPI |
 |---|---|
@@ -62,7 +82,11 @@ func main() {
 | 生JSON取得 | `Request` |
 | HTTPエラー | `HTTPError`の`StatusCode`・`Body` |
 
-`NewWithOptions`では`BaseURL`と`HTTPClient`を指定できます。テスト用サーバーへの接続や、HTTPクライアントの設定に使います。受け取った`context.Context`はHTTP通信まで渡し、自動再試行は行いません。
+### 接続先とHTTPクライアントの設定
+
+`NewWithOptions`では`BaseURL`と`HTTPClient`を指定できます。テスト用サーバーへの接続や、HTTPクライアントの設定に使います。
+
+受け取った`context.Context`はHTTP通信まで渡します。SDKは自動再試行を行いません。
 
 ## 開発・検証
 
@@ -72,11 +96,15 @@ GOWORK=off go vet ./...
 GOWORK=off go build ./...
 ```
 
-テストはダミーHTTPサーバーを使い、実Zaim APIへは接続しません。GitHub Actionsでもコードの整形・vet・race検査付きテスト・ビルドを検証します。
+テストはダミーHTTPサーバーを使い、実Zaim APIへは接続しません。
+
+GitHub Actionsでは、コードの整形、vet、race検査付きテスト、ビルドを検証します。
 
 ## 移植元
 
-[zaim-cliの`pkg/zaim`](https://github.com/yone-k/zaim-cli/tree/b94207824e3efd9759d6e8d185a6e660c5b17027/pkg/zaim)から、SDKと既存テストを移植しています。CLI・MCP側の参照変更、互換ラッパー、リリースタグの作成はこの移植には含めていません。
+[zaim-cliの`pkg/zaim`](https://github.com/yone-k/zaim-cli/tree/b94207824e3efd9759d6e8d185a6e660c5b17027/pkg/zaim)から、SDKと既存テストを移植しています。
+
+この移植の対象はSDKプロジェクトのみです。CLI・MCP側の参照変更、互換ラッパー、リリースタグの作成は含めていません。
 
 ## ライセンス
 
