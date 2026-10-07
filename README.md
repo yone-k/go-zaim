@@ -4,12 +4,12 @@ Zaim API向けのGo SDKです。OAuth 1.0a認証と、家計簿・ユーザー�
 
 ## 導入
 
-Go 1.26.2以上が必要です。リリースタグは未作成です。
+Go 1.26.2以上が必要です。
 
-利用するGoプロジェクトで、SDK移植コミットを指定して取得してください。
+利用するGoプロジェクトで、SDKのバージョンを指定して取得してください。
 
 ```bash
-go get github.com/yone-k/go-zaim@83d6c6393bd7
+go get github.com/yone-k/go-zaim@v0.1.0
 ```
 
 モジュールパスは`github.com/yone-k/go-zaim`、インポートしたパッケージの名前は`zaim`です。
